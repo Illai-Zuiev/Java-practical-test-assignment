@@ -1,5 +1,7 @@
 package clear.solutions.demo.service;
 
+import clear.solutions.demo.exception.EntityIdNotFoundException;
+import clear.solutions.demo.exception.UserAgeRestrictionException;
 import clear.solutions.demo.model.User;
 import clear.solutions.demo.repository.UserRepository;
 import clear.solutions.demo.request.UserModificationRequest;
@@ -55,12 +57,14 @@ public class UserService {
 
     private void isNotAgeRestriction(LocalDate birthDate) {
         if (birthDate.plusYears(userAgeRestriction).isAfter(LocalDate.now())) {
-            throw new RuntimeException("restriction");
+            throw new UserAgeRestrictionException("User must be more than " + userAgeRestriction + " age");
         }
     }
 
     private User isExistById(UUID userId) {
-        return userRepository.findById(userId).orElseThrow(() -> new RuntimeException("not exist"));
+        return userRepository
+                .findById(userId)
+                .orElseThrow(() -> new EntityIdNotFoundException("user with id " + userId + " is not found"));
     }
 
     public void deleteUserById(UUID userId) {
