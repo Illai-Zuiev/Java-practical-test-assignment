@@ -23,14 +23,14 @@ public class UserController {
 
     @GetMapping(value = "/users", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public List<User> findUser(@Valid UserBirthDateRangeFilter filter) {
+    public List<User> findUserByRange(@Valid UserBirthDateRangeFilter filter) {
         return userService.findByBirthDateRange(filter.getFromDate(), filter.getToDate());
     }
 
     @PostMapping(value = "/users", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    public void createUser(@Valid UserModificationRequest userModificationRequest) {
-        userService.createUser(userModificationRequest);
+    public User createUser(@Valid UserModificationRequest userModificationRequest) {
+        return userService.createUser(userModificationRequest);
     }
 
     @PutMapping(value = "/users/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)

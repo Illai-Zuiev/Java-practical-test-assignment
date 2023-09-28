@@ -21,10 +21,10 @@ public class UserService {
     @Value("${user.age.restriction}")
     private int userAgeRestriction;
 
-    public void createUser(UserModificationRequest userModificationRequest) {
+    public User createUser(UserModificationRequest userModificationRequest) {
         isNotAgeRestriction(userModificationRequest.getBirthDate());
 
-        userRepository.save(mapUserModificationRequestToUser(userModificationRequest));
+        return userRepository.save(mapUserModificationRequestToUser(userModificationRequest));
     }
 
     public void updateUser(UUID userId, UserModificationRequest userModificationRequest) {
@@ -68,6 +68,7 @@ public class UserService {
     }
 
     public void deleteUserById(UUID userId) {
+        isExistById(userId);
         userRepository.deleteById(userId);
     }
 
