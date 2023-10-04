@@ -1,6 +1,5 @@
 package clear.solutions.demo.exception.handler;
 
-import clear.solutions.demo.exception.UserAgeRestrictionException;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -20,12 +19,6 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.NOT_FOUND)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(logAndGetErrorMessage(request, e.getLocalizedMessage(), e));
-    }
-
-    @ExceptionHandler(UserAgeRestrictionException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorMessageResponse handleBadRequestException(RuntimeException e, ServletWebRequest request) {
-        return logAndGetErrorMessage(request, e.getLocalizedMessage(), e);
     }
 
     private ErrorMessageResponse logAndGetErrorMessage(ServletWebRequest request, String message, Exception e) {

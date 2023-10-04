@@ -35,18 +35,20 @@ public class UserController {
 
     @PutMapping(value = "/users/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public void updateUser(@PathVariable UUID userId, @Valid UserModificationRequest userModificationRequest) {
+    public String updateUser(@PathVariable UUID userId, @Valid UserModificationRequest userModificationRequest) {
         userService.updateUser(userId, userModificationRequest);
+        return "User was updated";
     }
 
     @PutMapping(value = "/users/{userId}/email", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public void updateUserEmail(@PathVariable UUID userId, @Email String email) {
+    public String updateUserEmail(@PathVariable UUID userId, @Email String email) {
         userService.updateUserEmail(userId, email);
+        return "User was updated";
     }
 
     @DeleteMapping(value = "/users/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteUser(@PathVariable UUID userId) {
         userService.deleteUserById(userId);
     }

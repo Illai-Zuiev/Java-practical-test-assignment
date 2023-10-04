@@ -1,7 +1,7 @@
 package clear.solutions.demo.controller;
 
 import clear.solutions.demo.exception.EntityIdNotFoundException;
-import clear.solutions.demo.exception.UserAgeRestrictionException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -14,6 +14,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -23,6 +24,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class UserControllerIntegrationTest {
     @Autowired
     private MockMvc mockMvc;
+    @Autowired
+    ObjectMapper objectMapper;
 
     @Test
     void findUserByRange_ShouldReturn200_WhenRangeIsCorrect() throws Exception {
@@ -32,7 +35,11 @@ class UserControllerIntegrationTest {
                         .param("fromDate", "2003-07-28")
                         .param("toDate", "2003-07-30"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(1)));
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$[0].email", is("email@gmail.com")))
+                .andExpect(jsonPath("$[0].firstName", is("illya")))
+                .andExpect(jsonPath("$[0].lastName", is("zuiew")))
+                .andExpect(jsonPath("$[0].birthDate", is("2003-07-28")));
     }
 
     @Test
@@ -56,7 +63,11 @@ class UserControllerIntegrationTest {
                         .param("firstName", "illya")
                         .param("lastName", "zuiew")
                         .param("birthDate", "2003-07-28"))
-                .andExpect(status().isCreated());
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.email", is("email@gmail.com")))
+                .andExpect(jsonPath("$.firstName", is("illya")))
+                .andExpect(jsonPath("$.lastName", is("zuiew")))
+                .andExpect(jsonPath("$.birthDate", is("2003-07-28")));
     }
 
     @Test
@@ -70,8 +81,7 @@ class UserControllerIntegrationTest {
                 .andReturn();
 
         assertThat(mvcResult.getResolvedException())
-                .isInstanceOf(UserAgeRestrictionException.class)
-                .hasMessageContainingAll("User must be more than 18 age");
+                .isInstanceOf(MethodArgumentNotValidException.class);
     }
 
     @Test
@@ -97,7 +107,8 @@ class UserControllerIntegrationTest {
                         .param("firstName", "ill")
                         .param("lastName", "zui")
                         .param("birthDate", "2005-07-28"))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", is("User was updated")));
     }
 
     @Test
@@ -113,7 +124,8 @@ class UserControllerIntegrationTest {
                 .andReturn();
 
         assertThat(mvcResult.getResolvedException())
-                .isInstanceOf(EntityIdNotFoundException.class);
+                .isInstanceOf(EntityIdNotFoundException.class)
+                .hasMessage("User is not found by id");
     }
 
     @Test
@@ -129,8 +141,7 @@ class UserControllerIntegrationTest {
                 .andReturn();
 
         assertThat(mvcResult.getResolvedException())
-                .isInstanceOf(UserAgeRestrictionException.class)
-                .hasMessageContainingAll("User must be more than 18 age");
+                .isInstanceOf(MethodArgumentNotValidException.class);
     }
 
     @Test
@@ -139,7 +150,8 @@ class UserControllerIntegrationTest {
 
         mockMvc.perform(put("/users/" + userId + "/email")
                         .param("email", "eee@gmail.com"))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", is("User was updated")));
     }
 
     @Test
@@ -152,15 +164,16 @@ class UserControllerIntegrationTest {
                 .andReturn();
 
         assertThat(mvcResult.getResolvedException())
-                .isInstanceOf(EntityIdNotFoundException.class);
+                .isInstanceOf(EntityIdNotFoundException.class)
+                .hasMessage("User is not found by id");
     }
 
     @Test
-    void deleteUser_ShouldReturn200_WhenUserIdExist() throws Exception {
+    void deleteUser_ShouldReturn204_WhenUserIdExist() throws Exception {
         String userId = createBasicUser();
 
         mockMvc.perform(delete("/users/" + userId))
-                .andExpect(status().isOk());
+                .andExpect(status().isNoContent());
     }
 
     @Test
@@ -172,7 +185,8 @@ class UserControllerIntegrationTest {
                 .andReturn();
 
         assertThat(mvcResult.getResolvedException())
-                .isInstanceOf(EntityIdNotFoundException.class);
+                .isInstanceOf(EntityIdNotFoundException.class)
+                .hasMessage("User is not found by id");
     }
 
     private String createBasicUser() throws Exception {

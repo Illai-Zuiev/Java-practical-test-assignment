@@ -1,7 +1,6 @@
 package clear.solutions.demo.service;
 
 import clear.solutions.demo.exception.EntityIdNotFoundException;
-import clear.solutions.demo.exception.UserAgeRestrictionException;
 import clear.solutions.demo.model.User;
 import clear.solutions.demo.repository.UserRepository;
 import clear.solutions.demo.request.UserModificationRequest;
@@ -18,7 +17,8 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest
 class UserServiceTest {
@@ -50,16 +50,6 @@ class UserServiceTest {
     }
 
     @Test
-    void createUser_shouldThrowException_WhenUserHasAgeRestriction() {
-        userModificationRequest.setBirthDate(LocalDate.of(2009, 10, 10));
-
-        assertAll(
-                () -> assertThrows(UserAgeRestrictionException.class, () -> userService.createUser(userModificationRequest)),
-                () -> verifyNoInteractions(userRepository)
-        );
-    }
-
-    @Test
     void updateUser_shouldUpdateUser_WhenUserDataIsCorrect() {
         when(userRepository.save(any(User.class))).thenReturn(userFromDb);
         when(userRepository.findById(userFromDb.getId())).thenReturn(Optional.of(userFromDb));
@@ -69,16 +59,6 @@ class UserServiceTest {
         assertAll(
                 () -> verify(userRepository).save(any(User.class)),
                 () -> verify(userRepository).findById(any(UUID.class))
-        );
-    }
-
-    @Test
-    void updateUser_shouldThrowException_WhenUserHasAgeRestriction() {
-        userModificationRequest.setBirthDate(LocalDate.of(2009, 10, 10));
-
-        assertAll(
-                () -> assertThrows(UserAgeRestrictionException.class, () -> userService.updateUser(userFromDb.getId(), userModificationRequest)),
-                () -> verifyNoInteractions(userRepository)
         );
     }
 
