@@ -1,7 +1,6 @@
 package clear.solutions.demo.controller;
 
 import clear.solutions.demo.exception.EntityIdNotFoundException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -24,8 +23,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class UserControllerIntegrationTest {
     @Autowired
     private MockMvc mockMvc;
-    @Autowired
-    ObjectMapper objectMapper;
 
     @Test
     void findUserByRange_ShouldReturn200_WhenRangeIsCorrect() throws Exception {
